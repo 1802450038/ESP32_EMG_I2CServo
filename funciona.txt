@@ -1,0 +1,47 @@
+// FUNCIONA
+
+
+const int emgPin = A0;
+const int limiteInferior = 2100;
+const int limiteSuperior = 2500;
+
+const int intervaloLeitura = 5;            // ms
+const int duracaoMinima = 10;             // ms
+const int tempoEspera = 1000;              // 1 segundo entre contagens
+const int leiturasNecessarias = duracaoMinima / intervaloLeitura;
+
+int contadorDentroDaFaixa = 0;
+bool contracaoDetectada = false;
+unsigned long tempoUltimaContracao = 0;
+int totalContracoes = 0;
+
+
+
+void loop() {
+  int emgValor = analogRead(emgPin);
+  Serial.print("EMG => ");
+  Serial.println(emgValor);
+
+  // Verifica se o sinal está dentro da faixa
+  if (emgValor >= limiteInferior && emgValor <= limiteSuperior) {
+    contadorDentroDaFaixa++;
+
+    // Se ficou por tempo suficiente, conta como contração
+
+    if (!contracaoDetectada && contadorDentroDaFaixa >= leiturasNecessarias) {
+      totalContracoes++;
+      Serial.print(">>> CONTRAÇÃO DETECTADA! Total: ");
+      Serial.println(totalContracoes);
+      contracaoDetectada = true;
+    }
+
+
+
+  } else {
+    // Se saiu da faixa, resetar contagem
+    contadorDentroDaFaixa = 0;
+    contracaoDetectada = false;
+  }
+
+  delay(intervaloLeitura);
+}
